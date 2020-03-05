@@ -31,38 +31,37 @@ def view_data_segments(xs, ys, a, b):
     ax.scatter(xs, ys, c=colour)
 
     # Plots reconstructed line
-    xs_1r = xs.min()
-    xs_2r = ys.max()
-    ys_1r = a + b * xs_1r
-    ys_2r = a + b * xs_2r
-
-    ax.plot([xs_1r, xs_2r], [ys_1r, ys_2r], 'r-', lw=4)
-
+    line_data = reconstruct_linear_line(xs, ys, a, b)
+    ax.plot([line_data[0], line_data[1]], [line_data[2], line_data[3]], 'r-', lw=4)
     plt.show()
 
-def least_squares(x, y):
+def least_squares_linear(x, y):
     # extend the first column with 1s
     ones = np.ones(x.shape)
     x_e = np.column_stack((ones, x))
     v = np.linalg.inv(x_e.T.dot(x_e)).dot(x_e.T).dot(y)
     return v[0], v[1]
 
-# def reconstructed_linear_line(xs, ys, a, b):
-#     xs_1r = xs.min()
-#     xs_2r = xy.max()
-#     ys_1r = a + b * xs_1r
-#     ys_2r = a + b * xs_2r
-#
-#     return xs_1r, xs_2r, ys_1r, ys_2r
+def reconstruct_linear_line(xs, ys, a, b):
+    x_1r = xs.min()
+    x_2r = ys.max()
+    y_1r = a + b * x_1r
+    y_2r = a + b * x_2r
 
-# Grabs filename from command line argument and saves points to variables
-csv_file = sys.argv[1]
-x_coordinates, y_coordinates = load_points_from_file(csv_file)
+    return x_1r, x_2r, y_1r, y_2r
 
-# Logical statement for optional '--plot' command line argument
-if len(sys.argv) == 3 and sys.argv[2] == '--plot':
-    a_1, b_1 = least_squares(x_coordinates, y_coordinates)
-    view_data_segments(x_coordinates, y_coordinates, a_1, b_1)
-    pass
-else:
-    pass
+
+def main():
+    # Grabs filename from command line argument and saves points to variables
+    csv_file = sys.argv[1]
+    x_coordinates, y_coordinates = load_points_from_file(csv_file)
+
+    # Logical statement for optional '--plot' command line argument
+    if len(sys.argv) == 3 and sys.argv[2] == '--plot':
+        a_1, b_1 = least_squares_linear(x_coordinates, y_coordinates)
+        view_data_segments(x_coordinates, y_coordinates, a_1, b_1)
+        pass
+    else:
+        pass
+
+main()
