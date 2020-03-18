@@ -53,18 +53,19 @@ def least_squares_polynomial(x, y):
     # extend the first column with 1s
     ones = np.ones(x.shape)
     x_squared = np.square(x)
+    x_cubed = np.power(x, 3)
 
-    x_e = np.column_stack((ones, x, x_squared))
+    x_e = np.column_stack((ones, x, x_squared, x_cubed))
     A = np.linalg.inv(x_e.T.dot(x_e)).dot(x_e.T).dot(y)
 
     # calculates error in regression line
-    y_hat = A[0] + A[1] * x + A[2] * np.square(x)
+    y_hat = A[0] + A[1] * x + A[2] * np.square(x) + A[3] * np.power(x, 3)
     error = np.sum((y - y_hat) ** 2)
 
-    return A[0], A[1], A[2], error
+    return A[0], A[1], A[2], A[3], error
 
-def reconstruct_polynomial_line(x, y, a, b1, b2):
-    y_r = a + b1 * x + b2 *np.square(x)
+def reconstruct_polynomial_line(x, y, a, b1, b2, b3):
+    y_r = a + b1 * x + b2 * np.square(x) + b3 * np.power(x, 3)
 
     return y_r
 
@@ -90,7 +91,7 @@ def main():
     error_list.append(total_reconstructed_linear_error)
 
     for i, j in zip(x_segments, y_segments):
-        a_1, b_1, b_2, error = least_squares_polynomial(i, j)
+        a_1, b_1, b_2, b_3, error = least_squares_polynomial(i, j)
 
         # Adds error to total reconstructed error for polynomial function
         total_reconstructed_polynomial_error += error
@@ -117,10 +118,10 @@ def main():
         # Plots polynomial function
         elif function_type == 1:
             for i, j in zip(x_segments, y_segments):
-                a_1, b_1, b_2, error = least_squares_polynomial(i, j)
+                a_1, b_1, b_2, b_3, error = least_squares_polynomial(i, j)
 
-                new_y = reconstruct_polynomial_line(i, j, a_1, b_1, b_2)
-                plt.plot(i, new_y, 'b-', lw=4)
+                new_y = reconstruct_polynomial_line(i, j, a_1, b_1, b_2, b_3)
+                plt.plot(i, new_y, 'r-', lw=4)
 
         plt.show()
         pass
