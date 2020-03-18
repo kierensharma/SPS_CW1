@@ -49,7 +49,7 @@ def reconstruct_linear_line(x, y, a, b):
 
     return x_1r, x_2r, y_1r, y_2r
 
-def least_squares_quadratic(x, y):
+def least_squares_polynomial(x, y):
     # extend the first column with 1s
     ones = np.ones(x.shape)
     x_squared = np.square(x)
@@ -63,7 +63,7 @@ def least_squares_quadratic(x, y):
 
     return A[0], A[1], A[2], error
 
-def reconstruct_quadratic_line(x, y, a, b1, b2):
+def reconstruct_polynomial_line(x, y, a, b1, b2):
     y_r = a + b1 * x + b2 *np.square(x)
 
     return y_r
@@ -74,7 +74,7 @@ def main():
     x_coordinates, y_coordinates = load_points_from_file(csv_file)
     error_list = []
     total_reconstructed_linear_error = 0
-    total_reconstructed_quadratic_error = 0
+    total_reconstructed_polynomial_error = 0
 
     # Splits x and y coordinate lists into equal length segments
     x_segments = [x_coordinates[i:i + 20] for i in range(0, len(x_coordinates), 20)]
@@ -90,12 +90,12 @@ def main():
     error_list.append(total_reconstructed_linear_error)
 
     for i, j in zip(x_segments, y_segments):
-        a_1, b_1, b_2, error = least_squares_quadratic(i, j)
+        a_1, b_1, b_2, error = least_squares_polynomial(i, j)
 
-        # Adds error to total reconstructed error for quadratic function
-        total_reconstructed_quadratic_error += error
+        # Adds error to total reconstructed error for polynomial function
+        total_reconstructed_polynomial_error += error
 
-    error_list.append(total_reconstructed_quadratic_error)
+    error_list.append(total_reconstructed_polynomial_error)
 
     # Finds smallest value in error list for all line types to determine function
     smallest_error = min(error_list)
@@ -106,6 +106,7 @@ def main():
     if len(sys.argv) == 3 and sys.argv[2] == '--plot':
         view_data_segments(x_coordinates, y_coordinates)
 
+        # Plots linear graph
         if function_type == 0:
             for i, j in zip(x_segments, y_segments):
                 a_1, b_1, error = least_squares_linear(i, j)
@@ -113,12 +114,13 @@ def main():
                 line_data = reconstruct_linear_line(i, j, a_1, b_1)
                 plt.plot([line_data[0], line_data[1]], [line_data[2], line_data[3]], 'r-', lw=4)
 
+        # Plots polynomial function
         elif function_type == 1:
             for i, j in zip(x_segments, y_segments):
-                a_1, b_1, b_2, error = least_squares_quadratic(i, j)
+                a_1, b_1, b_2, error = least_squares_polynomial(i, j)
 
-                new_y = reconstruct_quadratic_line(i, j, a_1, b_1, b_2)
-                plt.plot(i, new_y, 'r-', lw=4)
+                new_y = reconstruct_polynomial_line(i, j, a_1, b_1, b_2)
+                plt.plot(i, new_y, 'b-', lw=4)
 
         plt.show()
         pass
