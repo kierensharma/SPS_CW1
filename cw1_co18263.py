@@ -73,9 +73,8 @@ def main():
     # Grabs filename from command line argument and saves points to variables
     csv_file = sys.argv[1]
     x_coordinates, y_coordinates = load_points_from_file(csv_file)
-    error_list = []
-    total_reconstructed_linear_error = 0
-    total_reconstructed_polynomial_error = 0
+    function_type_list = []
+    total_reconstructed_error = 0
 
     # Splits x and y coordinate lists into equal length segments
     x_segments = [x_coordinates[i:i + 20] for i in range(0, len(x_coordinates), 20)]
@@ -83,47 +82,59 @@ def main():
 
     # Plots reconstructed line segments, of length 20 data points
     for i, j in zip(x_segments, y_segments):
-        a_1, b_1, error = least_squares_linear(i, j)
+        a_1_linear, b_1_linear, linear_error = least_squares_linear(i, j)
+        a_1_poly, b_1_poly, b_2_poly, b_3_poly, poly_error = least_squares_polynomial(i, j)
 
-        # Adds error to total reconstructed error for linear function
-        total_reconstructed_linear_error += error
+        # If segment is linear
+        if linear_error < poly_error:
+            error = linear_error
+            function_type_list.append(0)
 
-    error_list.append(total_reconstructed_linear_error)
+        # If segment is polynomial
+        else:
+            error = poly_error
+            function_type_list.append(1)
 
-    for i, j in zip(x_segments, y_segments):
-        a_1, b_1, b_2, b_3, error = least_squares_polynomial(i, j)
+        # Adds error to total reconstructed error for total function
+        total_reconstructed_error += error
 
-        # Adds error to total reconstructed error for polynomial function
-        total_reconstructed_polynomial_error += error
-
-    error_list.append(total_reconstructed_polynomial_error)
-
-    # Finds smallest value in error list for all line types to determine function
-    smallest_error = min(error_list)
-    print(smallest_error)
-    function_type = error_list.index(smallest_error)
+    print(total_reconstructed_error)
 
     # Logical statement for optional '--plot' command line argument
     if len(sys.argv) == 3 and sys.argv[2] == '--plot':
         view_data_segments(x_coordinates, y_coordinates)
 
-        # Plots linear graph
-        if function_type == 0:
-            for i, j in zip(x_segments, y_segments):
+        for i, j, f in zip(x_segments, y_segments, function_type_list):
+            if f == 0:
                 a_1, b_1, error = least_squares_linear(i, j)
 
                 line_data = reconstruct_linear_line(i, j, a_1, b_1)
                 plt.plot([line_data[0], line_data[1]], [line_data[2], line_data[3]], 'r-', lw=4)
-
-        # Plots polynomial function
-        elif function_type == 1:
-            for i, j in zip(x_segments, y_segments):
+            elif f == 1:
                 a_1, b_1, b_2, b_3, error = least_squares_polynomial(i, j)
 
                 new_y = reconstruct_polynomial_line(i, j, a_1, b_1, b_2, b_3)
-                plt.plot(i, new_y, 'r-', lw=4)
+                plt.plot(i, new_y, 'b-', lw=4)
 
         plt.show()
+
+        # # Plots linear graph
+        # if function_type == 0:
+        #     for i, j in zip(x_segments, y_segments):
+        #         a_1, b_1, error = least_squares_linear(i, j)
+        #
+        #         line_data = reconstruct_linear_line(i, j, a_1, b_1)
+        #         plt.plot([line_data[0], line_data[1]], [line_data[2], line_data[3]], 'r-', lw=4)
+        #
+        # # Plots polynomial function
+        # elif function_type == 1:
+        #     for i, j in zip(x_segments, y_segments):
+        #         a_1, b_1, b_2, b_3, error = least_squares_polynomial(i, j)
+        #
+        #         new_y = reconstruct_polynomial_line(i, j, a_1, b_1, b_2, b_3)
+        #         plt.plot(i, new_y, 'b-', lw=4)
+        #
+        # plt.show()
         pass
 
     else:
