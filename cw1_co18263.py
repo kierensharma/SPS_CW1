@@ -114,7 +114,7 @@ def main():
                 a_1, b_1, b_2, b_3, error = least_squares_polynomial(i, j)
 
                 new_y = reconstruct_polynomial_line(i, j, a_1, b_1, b_2, b_3)
-                plt.plot(i, new_y, 'b-', lw=4)
+                plt.plot(i, new_y, 'r-', lw=4)
 
         plt.show()
         pass
