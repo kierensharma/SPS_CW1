@@ -109,12 +109,12 @@ def main():
                 a_1, b_1, error = least_squares_linear(i, j)
 
                 line_data = reconstruct_linear_line(i, j, a_1, b_1)
-                plt.plot([line_data[0], line_data[1]], [line_data[2], line_data[3]], 'r-', lw=4)
+                plt.plot([line_data[0], line_data[1]], [line_data[2], line_data[3]], 'r-', lw=2)
             elif f == 1:
                 a_1, b_1, b_2, b_3, error = least_squares_polynomial(i, j)
 
                 new_y = reconstruct_polynomial_line(i, j, a_1, b_1, b_2, b_3)
-                plt.plot(i, new_y, 'r-', lw=4)
+                plt.plot(i, new_y, 'r-', lw=2)
 
         plt.show()
         pass
