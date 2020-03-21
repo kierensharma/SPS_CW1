@@ -35,7 +35,7 @@ def least_squares_linear(x, y):
     x_e = np.column_stack((ones, x))
     A = np.linalg.inv(x_e.T.dot(x_e)).dot(x_e.T).dot(y)
 
-    # Calculates error in regression line
+    # Calculates least square error in regression line
     y_hat = A[0] + A[1] * x
     error = np.sum((y - y_hat) ** 2)
 
@@ -58,7 +58,7 @@ def least_squares_polynomial(x, y):
     x_e = np.column_stack((ones, x, x_squared, x_cubed))
     A = np.linalg.inv(x_e.T.dot(x_e)).dot(x_e.T).dot(y)
 
-    # calculates error in regression line
+    # calculates least square error in regression line
     y_hat = A[0] + A[1] * x + A[2] * np.square(x) + A[3] * np.power(x, 3)
     error = np.sum((y - y_hat) ** 2)
 
@@ -68,6 +68,22 @@ def reconstruct_polynomial_line(x, y, a, b1, b2, b3):
     y_r = a + b1 * x + b2 * np.square(x) + b3 * np.power(x, 3)
 
     return y_r
+
+def least_squares_other(x, y):
+    x_e = np.column_stack((np.ones(x.shape), np.sin(x)))
+    A = np.linalg.inv(x_e.T.dot(x_e)).dot(x_e.T).dot(y)
+
+    # calculates least square error in regression line
+    y_hat = A[0] + A[1] * np.sin(x)
+    error = np.sum((y - y_hat) ** 2)
+
+    return A[0], A[1], error
+
+def reconstruct_other_line(x, y, a, b):
+    y_r = a + b * np.sin(x)
+
+    return y_r
+
 
 def main():
     # Grabs filename from command line argument and saves points to variables
@@ -84,16 +100,21 @@ def main():
     for i, j in zip(x_segments, y_segments):
         a_1_linear, b_1_linear, linear_error = least_squares_linear(i, j)
         a_1_poly, b_1_poly, b_2_poly, b_3_poly, poly_error = least_squares_polynomial(i, j)
+        a_1_other, b_1_other, other_error = least_squares_other(i, j)
 
         # If segment is linear
-        if linear_error < poly_error:
+        if linear_error < poly_error and linear_error < other_error:
             error = linear_error
             function_type_list.append(0)
 
         # If segment is polynomial
-        else:
+        elif poly_error < linear_error and poly_error < other_error:
             error = poly_error
             function_type_list.append(1)
+
+        else:
+            error = other_error
+            function_type_list.append(2)
 
         # Adds error to total reconstructed error for total function
         total_reconstructed_error += error
@@ -110,10 +131,17 @@ def main():
 
                 line_data = reconstruct_linear_line(i, j, a_1, b_1)
                 plt.plot([line_data[0], line_data[1]], [line_data[2], line_data[3]], 'r-', lw=2)
+
             elif f == 1:
                 a_1, b_1, b_2, b_3, error = least_squares_polynomial(i, j)
 
                 new_y = reconstruct_polynomial_line(i, j, a_1, b_1, b_2, b_3)
+                plt.plot(i, new_y, 'r-', lw=2)
+
+            elif f == 2:
+                a_1, b_1, error = least_squares_other(i, j)
+
+                new_y = reconstruct_other_line(i, j, a_1, b_1)
                 plt.plot(i, new_y, 'r-', lw=2)
 
         plt.show()
