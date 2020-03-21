@@ -87,6 +87,7 @@ def reconstruct_other_line(x, a, b):
 
 def main():
     # Grabs filename from command line argument and saves points to variables
+    assert len(sys.argv) == 2
     csv_file = sys.argv[1]
     x_coordinates, y_coordinates = load_points_from_file(csv_file)
     function_type_list = []
