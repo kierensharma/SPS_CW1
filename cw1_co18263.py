@@ -41,7 +41,7 @@ def least_squares_linear(x, y):
 
     return A[0], A[1], error
 
-def reconstruct_linear_line(x, y, a, b):
+def reconstruct_linear_line(x, a, b):
     x_1r = x.min()
     x_2r = x.max()
     y_1r = a + b * x_1r
@@ -64,7 +64,7 @@ def least_squares_polynomial(x, y):
 
     return A[0], A[1], A[2], A[3], error
 
-def reconstruct_polynomial_line(x, y, a, b1, b2, b3):
+def reconstruct_polynomial_line(x, a, b1, b2, b3):
     y_r = a + b1 * x + b2 * np.square(x) + b3 * np.power(x, 3)
 
     return y_r
@@ -79,7 +79,7 @@ def least_squares_other(x, y):
 
     return A[0], A[1], error
 
-def reconstruct_other_line(x, y, a, b):
+def reconstruct_other_line(x, a, b):
     y_r = a + b * np.sin(x)
 
     return y_r
@@ -129,19 +129,19 @@ def main():
             if f == 0:
                 a_1, b_1, error = least_squares_linear(i, j)
 
-                line_data = reconstruct_linear_line(i, j, a_1, b_1)
+                line_data = reconstruct_linear_line(i, a_1, b_1)
                 plt.plot([line_data[0], line_data[1]], [line_data[2], line_data[3]], 'r-', lw=2)
 
             elif f == 1:
                 a_1, b_1, b_2, b_3, error = least_squares_polynomial(i, j)
 
-                new_y = reconstruct_polynomial_line(i, j, a_1, b_1, b_2, b_3)
+                new_y = reconstruct_polynomial_line(i, a_1, b_1, b_2, b_3)
                 plt.plot(i, new_y, 'r-', lw=2)
 
             elif f == 2:
                 a_1, b_1, error = least_squares_other(i, j)
 
-                new_y = reconstruct_other_line(i, j, a_1, b_1)
+                new_y = reconstruct_other_line(i, a_1, b_1)
                 plt.plot(i, new_y, 'r-', lw=2)
 
         plt.show()
