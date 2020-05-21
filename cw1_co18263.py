@@ -59,7 +59,7 @@ def least_squares_polynomial(x, y):
     A = np.linalg.inv(x_e.T.dot(x_e)).dot(x_e.T).dot(y)
 
     # calculates least square error in regression line
-    y_hat = A[0] + A[1] * x + A[2] * np.square(x) + A[3] * np.power(x, 3)
+    y_hat = A[0] + A[1]  x + A[2] * np.square(x) + A[3] * np.power(x, 3)
     error = np.sum((y - y_hat) ** 2)
 
     return A[0], A[1], A[2], A[3], error
@@ -83,6 +83,13 @@ def reconstruct_other_line(x, a, b):
     y_r = a + b * np.sin(x)
 
     return y_r
+
+def cross_validation(x, y):
+    X_train = x[:7]
+    X_test = x[7:]
+
+    Y_train = y[:7]
+    Y_test = y[7:]
 
 def main():
     # Grabs filename from command line argument and saves points to variables
